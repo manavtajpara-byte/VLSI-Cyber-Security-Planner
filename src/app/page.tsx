@@ -188,8 +188,8 @@ export default function Dashboard() {
   // Fetch events once
   useEffect(() => {
     setEvents([
-      { id: "e1", title: "Monthly Hackathon", date: "2026-07-20", type: "hackathon" },
-      { id: "e2", title: "Linux Basics Test", date: "2026-07-28", type: "test" }
+      { title: "Monthly Hackathon", date: "2026-07-20", type: "hackathon" },
+      { title: "Linux Basics Test", date: "2026-07-28", type: "test" }
     ]);
   }, []);
 
