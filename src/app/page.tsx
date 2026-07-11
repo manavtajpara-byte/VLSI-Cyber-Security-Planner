@@ -188,8 +188,8 @@ export default function Dashboard() {
   // Fetch events once
   useEffect(() => {
     setEvents([
-      { title: "Monthly Hackathon", date: "2026-07-20", type: "hackathon" },
-      { title: "Linux Basics Test", date: "2026-07-28", type: "test" }
+      { name: "Monthly Hackathon", category: "hackathon", url: "https://devfolio.co", description: "Compete in a monthly hackathon to apply your VLSI/Cyber skills." },
+      { name: "Linux Basics Test", category: "test", url: "#", description: "End-of-month test covering Linux CLI fundamentals." }
     ]);
   }, []);
 
