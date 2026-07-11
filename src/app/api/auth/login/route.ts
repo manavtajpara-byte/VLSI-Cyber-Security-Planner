@@ -21,15 +21,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Enforce 3-device limit
-    const activeSessions = user.sessions.filter((s: any) => s.expiresAt > new Date());
-    if (activeSessions.length >= 3) {
-      return NextResponse.json(
-        { error: 'Maximum 3 devices allowed. Please logout from another device first.' },
-        { status: 403 }
-      );
-    }
-
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
