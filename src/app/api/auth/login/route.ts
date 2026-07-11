@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Enforce 3-device limit
-    const activeSessions = user.sessions.filter((s) => s.expiresAt > new Date());
+    const activeSessions = user.sessions.filter((s: any) => s.expiresAt > new Date());
     if (activeSessions.length >= 3) {
       return NextResponse.json(
         { error: 'Maximum 3 devices allowed. Please logout from another device first.' },
