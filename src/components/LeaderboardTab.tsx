@@ -18,13 +18,14 @@ export function LeaderboardTab({ currentUserId }: { currentUserId: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/leaderboard")
-      .then(r => r.json())
-      .then(data => {
-        if (data.leaderboard) setLeaderboard(data.leaderboard);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    setTimeout(() => {
+      setLeaderboard([
+        { id: "1", displayName: "You (Guest)", xp: 120, streak: 3, badges: [] },
+        { id: "2", displayName: "Alex P.", xp: 95, streak: 1, badges: [] },
+        { id: "3", displayName: "Sarah W.", xp: 40, streak: 0, badges: [] }
+      ]);
+      setLoading(false);
+    }, 500);
   }, []);
 
   if (loading) {

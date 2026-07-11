@@ -187,7 +187,10 @@ export default function Dashboard() {
 
   // Fetch events once
   useEffect(() => {
-    fetch("/api/events").then((r) => r.json()).then((d) => setEvents(d.events || [])).catch(() => {});
+    setEvents([
+      { id: "e1", title: "Monthly Hackathon", date: "2026-07-20", type: "hackathon" },
+      { id: "e2", title: "Linux Basics Test", date: "2026-07-28", type: "test" }
+    ]);
   }, []);
 
   // Local helper for logging XP
