@@ -137,12 +137,17 @@ export default function Dashboard() {
   const [events, setEvents] = useState<EventItem[]>([]);
 
   // UI state
-  const [activeTab, setActiveTab] = useState<"timetable" | "tests" | "hackathons" | "events" | "analytics" | "leaderboard">("timetable");
+  const [activeTab, setActiveTab] = useState<"timetable" | "schedule" | "tests" | "hackathons" | "events" | "analytics" | "leaderboard">("schedule");
+  const [backlogTasks, setBacklogTasks] = useState<{ id: string; text: string; done: boolean }[]>([]);
+  const [newBacklogText, setNewBacklogText] = useState("");
   const [expandedMonths, setExpandedMonths] = useState<Record<number, boolean>>({});
   const [showVacForm, setShowVacForm] = useState(false);
   const [vacStart, setVacStart] = useState("");
   const [vacEnd, setVacEnd] = useState("");
   const [quizMonth, setQuizMonth] = useState<number | null>(null);
+
+  const monthsElapsed = user?.startDate ? Math.floor((new Date().getTime() - new Date(user.startDate).getTime()) / (1000 * 60 * 60 * 24 * 30)) : 0;
+  const isLast6Months = monthsElapsed >= 30;
 
   // Init: show roadmap immediately — set start date to today
   useEffect(() => {
@@ -163,6 +168,9 @@ export default function Dashboard() {
 
       const savedHours = localStorage.getItem("roadmap-study-hours");
       if (savedHours) setTotalStudyHours(parseFloat(savedHours));
+
+      const savedBacklog = localStorage.getItem("roadmap-backlog");
+      if (savedBacklog) setBacklogTasks(JSON.parse(savedBacklog));
 
       // Local gamification loading
       const localXP = localStorage.getItem("roadmap-xp");
@@ -235,6 +243,21 @@ export default function Dashboard() {
     const updated = { ...completedTasks, [taskId]: newVal };
     setCompletedTasks(updated);
     localStorage.setItem("roadmap-tasks", JSON.stringify(updated));
+  };
+
+  const addBacklogTask = () => {
+    if (!newBacklogText.trim()) return;
+    const newTask = { id: Date.now().toString(), text: newBacklogText.trim(), done: false };
+    const updated = [...backlogTasks, newTask];
+    setBacklogTasks(updated);
+    localStorage.setItem("roadmap-backlog", JSON.stringify(updated));
+    setNewBacklogText("");
+  };
+
+  const toggleBacklogTask = (id: string) => {
+    const updated = backlogTasks.map(t => t.id === id ? { ...t, done: !t.done } : t);
+    setBacklogTasks(updated);
+    localStorage.setItem("roadmap-backlog", JSON.stringify(updated));
   };
 
   const addVacation = () => {
@@ -336,9 +359,9 @@ export default function Dashboard() {
         <div>
           {/* ═══ TABS ═══ */}
           <div className="tabs" style={{ marginBottom: 20, display: "inline-flex", flexWrap: "wrap", gap: 8 }}>
-            {(["timetable", "tests", "hackathons", "analytics", "leaderboard"] as const).map((t) => (
+            {(["schedule", "timetable", "tests", "hackathons", "analytics", "leaderboard"] as const).map((t) => (
               <button key={t} className={`tab ${activeTab === t ? "active" : ""}`} onClick={() => setActiveTab(t)}>
-                {t === "timetable" ? "📅 Timetable" : t === "tests" ? "📝 Tests" : t === "analytics" ? "📊 Analytics" : t === "leaderboard" ? "🌍 Leaderboard" : "🏆 Hackathons"}
+                {t === "schedule" ? "🕒 Daily Plan" : t === "timetable" ? "📅 Curriculum" : t === "tests" ? "📝 Tests" : t === "analytics" ? "📊 Analytics" : t === "leaderboard" ? "🌍 Leaderboard" : "🏆 Hackathons"}
               </button>
             ))}
           </div>
@@ -346,6 +369,83 @@ export default function Dashboard() {
           {/* ═══ LEADERBOARD TAB ═══ */}
           {activeTab === "leaderboard" && (
             <LeaderboardTab currentUserId={user?.id || ""} />
+          )}
+
+          {/* ═══ SCHEDULE TAB ═══ */}
+          {activeTab === "schedule" && (
+            <div>
+              <div className="card" style={{ padding: 24, marginBottom: 24 }}>
+                <h2 style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--vlsi)", marginBottom: 16 }}>
+                  Weekdays (Mon - Fri)
+                </h2>
+                <div style={{ display: "grid", gridTemplateColumns: "100px 1fr", gap: "12px 16px", fontSize: "0.95rem" }}>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>11pm - 6am</div><div>😴 Sleep (7 hrs)</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>6am - 7am</div><div>🌅 Morning routine</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>7am - 9:30am</div><div>📚 Cyber Security / VLSI Study Block</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>9:30am - 10am</div><div>🎒 {isLast6Months ? "Free Time / Deep Work Prep" : "Travel to college"}</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>10am - 6pm</div><div>{isLast6Months ? "💻 Full-Time Job Hunting, Interviews & Advanced Labs" : "🏫 College"}</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>6pm - 6:30pm</div><div>☕ Break + freshen up</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>6:30pm - 8pm</div><div>{isLast6Months ? "📚 Interview Prep & Algorithms" : "📝 College Assignments & Tutorials"}</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>8pm - 9:45pm</div><div>💻 Practical Labs (Kali / Python / Coding)</div>
+                  <div style={{ color: "var(--purple)", fontWeight: 800 }}>9:45pm - 10:30pm</div><div style={{ color: "var(--purple)", fontWeight: 700 }}>🎮 Personal Time (45 min)</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>10:30pm - 11pm</div><div>🌙 Wind down</div>
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: 24, marginBottom: 24 }}>
+                <h2 style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--cyber)", marginBottom: 16 }}>
+                  Weekends (Sat - Sun)
+                </h2>
+                <div style={{ display: "grid", gridTemplateColumns: "100px 1fr", gap: "12px 16px", fontSize: "0.95rem" }}>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>11pm - 7am</div><div>😴 Sleep (8 hrs)</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>7am - 8am</div><div>🌅 Morning routine</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>8am - 12pm</div><div>📚 Deep Study Block</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>12pm - 1pm</div><div>🍽️ Lunch + rest</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>1pm - 4pm</div><div>💻 Hands-on Labs</div>
+                  <div style={{ color: "var(--purple)", fontWeight: 800 }}>4pm - 6pm</div><div style={{ color: "var(--purple)", fontWeight: 700 }}>🎮 Personal Time</div>
+                  <div style={{ color: "var(--text-muted)", fontWeight: 600 }}>6pm - 7:30pm</div><div>📖 Weekly Revision</div>
+                  <div style={{ color: "var(--purple)", fontWeight: 800 }}>7:30pm - 11pm</div><div style={{ color: "var(--purple)", fontWeight: 700 }}>🎮 Personal Time</div>
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: 24 }}>
+                <h2 style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--pink)", marginBottom: 16 }}>
+                  📝 Daily Backlog & Custom Tasks
+                </h2>
+                <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+                  <input
+                    type="text"
+                    className="input"
+                    value={newBacklogText}
+                    onChange={(e) => setNewBacklogText(e.target.value)}
+                    placeholder="e.g. Finish digital logic assignment..."
+                    onKeyDown={(e) => e.key === "Enter" && addBacklogTask()}
+                  />
+                  <button className="btn btn-primary" onClick={addBacklogTask}>Add</button>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {backlogTasks.map((t) => (
+                    <label key={t.id} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "12px", background: "rgba(255,255,255,0.03)", borderRadius: 8, cursor: "pointer", border: "1px solid var(--border)" }}>
+                      <input
+                        type="checkbox"
+                        className="task-check"
+                        checked={t.done}
+                        onChange={() => toggleBacklogTask(t.id)}
+                        style={{ marginTop: 3 }}
+                      />
+                      <span style={{
+                        flex: 1, fontWeight: 500,
+                        textDecoration: t.done ? "line-through" : "none",
+                        color: t.done ? "var(--text-muted)" : "var(--text-primary)",
+                      }}>
+                        {t.text}
+                      </span>
+                    </label>
+                  ))}
+                  {backlogTasks.length === 0 && <p style={{ color: "var(--text-muted)" }}>No tasks in your backlog today!</p>}
+                </div>
+              </div>
+            </div>
           )}
 
           {/* ═══ ANALYTICS TAB ═══ */}
@@ -433,6 +533,7 @@ export default function Dashboard() {
                                         </span>
                                         {task.type === "test" && <span className="tag tag-test">TEST</span>}
                                         {task.type === "hackathon" && <span className="tag tag-hack">HACKATHON</span>}
+                                        {task.estimatedTime && <span className="tag tag-time">⏱️ {task.estimatedTime}</span>}
                                       </div>
                                       <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginTop: 3 }}>{task.description}</p>
                                     </div>

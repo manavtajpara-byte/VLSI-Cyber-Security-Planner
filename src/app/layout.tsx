@@ -20,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="bg-circuit" />
         <div className="bg-orb vlsi" />
         <div className="bg-orb cyber" />
+        <div className="bg-orb extra" />
         {children}
         <script
           dangerouslySetInnerHTML={{

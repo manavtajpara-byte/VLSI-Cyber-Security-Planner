@@ -11,6 +11,7 @@ export interface Task {
   track: 'vlsi' | 'cyber' | 'general';
   type: 'learn' | 'practice' | 'project' | 'hackathon' | 'test';
   resource?: string;
+  estimatedTime?: string;
 }
 
 export interface WeekPlan {
@@ -421,6 +422,22 @@ function generateWeeks(): WeekPlan[] {
       });
     }
   }
+
+  // Assign estimated times dynamically
+  weeks.forEach(w => {
+    w.tasks.forEach(t => {
+      if (!t.estimatedTime) {
+        switch (t.type) {
+          case 'learn': t.estimatedTime = '1.5h'; break;
+          case 'practice': t.estimatedTime = '45m'; break;
+          case 'project': t.estimatedTime = '3h'; break;
+          case 'test': t.estimatedTime = '2h'; break;
+          case 'hackathon': t.estimatedTime = '48h'; break;
+          default: t.estimatedTime = '1h'; break;
+        }
+      }
+    });
+  });
 
   return weeks;
 }
