@@ -425,51 +425,6 @@ export default function Dashboard() {
           {activeTab === "timetable" && (
             <div>
 
-              {/* ── DAILY SCHEDULE ── */}
-              <h2 style={{ fontSize: "1.5rem", fontWeight: 900, marginBottom: 16, color: "var(--vlsi)", display: "flex", alignItems: "center", gap: 10 }}>
-                🕒 Your Daily Schedule
-              </h2>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
-                {/* Weekday */}
-                <div className="card" style={{ padding: 20, borderLeft: "4px solid var(--vlsi)" }}>
-                  <h3 style={{ fontWeight: 800, color: "var(--vlsi)", marginBottom: 14, fontSize: "1rem" }}>📅 Weekdays (Mon – Fri)</h3>
-                  <div style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: "10px 12px", fontSize: "0.85rem" }}>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>11pm – 6am</span><span>😴 Sleep <span style={{ color: "var(--purple)", fontWeight: 700 }}>(7 hrs)</span></span>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>6am – 7am</span><span>🌅 Morning routine</span>
-                    <span style={{ color: "var(--cyber)", fontWeight: 700 }}>7am – 9:30am</span><span style={{ color: "var(--cyber)", fontWeight: 600 }}>📚 {cyberVlsiTasks}</span>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>9:30am – 10am</span><span>🎒 {isLast6Months ? "Free Time / Deep Work Prep" : "Travel to college"}</span>
-                    <span style={{ color: "var(--vlsi)", fontWeight: 700 }}>10am – 6pm</span><span style={{ color: "var(--vlsi)", fontWeight: 600 }}>{isLast6Months ? "💻 Job Hunting & Advanced Labs" : "🏫 College"}</span>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>6pm – 6:30pm</span><span>☕ Break + freshen up</span>
-                    <span style={{ color: "var(--gold)", fontWeight: 700 }}>6:30pm – 8pm</span><span style={{ color: "var(--gold)", fontWeight: 600 }}>{isLast6Months ? "📚 Interview Prep & Algorithms" : "📝 College Assignments & Tutorials"}</span>
-                    <span style={{ color: "var(--cyber)", fontWeight: 700 }}>8pm – 9:45pm</span><span style={{ color: "var(--cyber)", fontWeight: 600 }}>💻 {practicalTasks}</span>
-                    <span style={{ color: "var(--purple)", fontWeight: 800 }}>9:45pm – 10:30pm</span><span style={{ color: "var(--purple)", fontWeight: 700 }}>🎮 Personal Time (45 min)</span>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>10:30pm – 11pm</span><span>🌙 Wind down</span>
-                  </div>
-                </div>
-
-                {/* Weekend */}
-                <div className="card" style={{ padding: 20, borderLeft: "4px solid var(--cyber)" }}>
-                  <h3 style={{ fontWeight: 800, color: "var(--cyber)", marginBottom: 14, fontSize: "1rem" }}>🗓️ Weekends (Sat – Sun)</h3>
-                  <div style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: "10px 12px", fontSize: "0.85rem" }}>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>11pm – 7am</span><span>😴 Sleep <span style={{ color: "var(--purple)", fontWeight: 700 }}>(8 hrs)</span></span>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>7am – 8am</span><span>🌅 Morning routine</span>
-                    <span style={{ color: "var(--cyber)", fontWeight: 700 }}>8am – 12pm</span><span style={{ color: "var(--cyber)", fontWeight: 600 }}>📚 Deep Study Block — {cyberVlsiTasks}</span>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>12pm – 1pm</span><span>🍽️ Lunch + rest</span>
-                    <span style={{ color: "var(--cyber)", fontWeight: 700 }}>1pm – 4pm</span><span style={{ color: "var(--cyber)", fontWeight: 600 }}>💻 Hands-on Labs — {practicalTasks}</span>
-                    <span style={{ color: "var(--purple)", fontWeight: 800 }}>4pm – 5pm</span><span style={{ color: "var(--purple)", fontWeight: 700 }}>🎮 Personal Time (45 min)</span>
-                    <span style={{ color: "var(--gold)", fontWeight: 700 }}>5pm – 7pm</span><span style={{ color: "var(--gold)", fontWeight: 600 }}>📖 Weekly Revision</span>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>7pm – 9pm</span><span>💡 Project / Portfolio work</span>
-                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>9pm – 11pm</span><span>🌙 Wind down + Personal Time</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── 3-YEAR CURRICULUM ── */}
-              <h2 style={{ fontSize: "1.5rem", fontWeight: 900, marginBottom: 16, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 10 }}>
-                📚 3-Year Curriculum
-              </h2>
-
               {years.map((year) => (
                 <div key={year} style={{ marginBottom: 32 }}>
                   <h2 style={{ fontSize: "1.3rem", fontWeight: 800, marginBottom: 16, color: "var(--text-primary)" }}>
@@ -505,56 +460,83 @@ export default function Dashboard() {
                         </div>
                         {isExpanded && (
                           <div style={{ padding: "8px 16px 16px" }}>
-                            {weeks.map((week) => (
-                              <div key={week.weekIndex} style={{ marginBottom: 16 }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                                  <h4 style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--text-primary)" }}>{week.title}</h4>
-                                  {user && (
-                                    <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>
-                                      {getWeekCalendarDate(week.weekIndex, user.startDate, vacations)}
-                                    </span>
-                                  )}
-                                </div>
-                                {week.hackathonAlert && (
-                                  <div style={{ marginBottom: 10, padding: "10px 14px", background: "var(--pink-glow)", borderRadius: 10, border: "1px solid rgba(255,60,120,0.3)" }}>
-                                    <span className="tag tag-hack" style={{ marginBottom: 6 }}>🏆 {week.hackathonAlert.name}</span>
-                                    <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: 4 }}>{week.hackathonAlert.description}</p>
-                                    <a href={week.hackathonAlert.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--pink)", fontSize: "0.8rem", fontWeight: 600 }}>
-                                      Register →
-                                    </a>
+                            {weeks.map((week) => {
+                              const weekTheory = week.tasks.filter(t => t.type === 'learn').map(t => t.title).join(" + ") || "Cyber / VLSI Theory Study";
+                              const weekLab = week.tasks.filter(t => t.type === 'practice' || t.type === 'project').map(t => t.title).join(" + ") || "Practical Hands-on Labs";
+                              return (
+                                <div key={week.weekIndex} style={{ marginBottom: 20, padding: 16, border: "1px solid var(--border)", borderRadius: 12, background: "rgba(255, 255, 255, 0.01)" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                                    <h4 style={{ fontWeight: 800, fontSize: "0.95rem", color: "var(--text-primary)" }}>{week.title}</h4>
+                                    {user && (
+                                      <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                                        {getWeekCalendarDate(week.weekIndex, user.startDate, vacations)}
+                                      </span>
+                                    )}
                                   </div>
-                                )}
-                                {week.tasks.map((task) => (
-                                  <label key={task.id} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "8px 0", cursor: "pointer", borderBottom: "1px solid var(--border)" }}>
-                                    <input
-                                      type="checkbox"
-                                      className="task-check"
-                                      checked={!!completedTasks[task.id]}
-                                      onChange={() => toggleTask(task.id)}
-                                      style={{ marginTop: 3 }}
-                                    />
-                                    <div style={{ flex: 1 }}>
-                                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                                        <span style={{
-                                          fontWeight: 600, fontSize: "0.9rem",
-                                          textDecoration: completedTasks[task.id] ? "line-through" : "none",
-                                          color: completedTasks[task.id] ? "var(--text-muted)" : "var(--text-primary)",
-                                        }}>
-                                          {task.title}
-                                        </span>
-                                        <span className={`tag ${task.track === "vlsi" ? "tag-vlsi" : task.track === "cyber" ? "tag-cyber" : "tag-general"}`}>
-                                          {task.track}
-                                        </span>
-                                        {task.type === "test" && <span className="tag tag-test">TEST</span>}
-                                        {task.type === "hackathon" && <span className="tag tag-hack">HACKATHON</span>}
-                                        {task.estimatedTime && <span className="tag tag-time">⏱️ {task.estimatedTime}</span>}
-                                      </div>
-                                      <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginTop: 3 }}>{task.description}</p>
+                                  {week.hackathonAlert && (
+                                    <div style={{ marginBottom: 10, padding: "10px 14px", background: "var(--pink-glow)", borderRadius: 10, border: "1px solid rgba(255,60,120,0.3)" }}>
+                                      <span className="tag tag-hack" style={{ marginBottom: 6 }}>🏆 {week.hackathonAlert.name}</span>
+                                      <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: 4 }}>{week.hackathonAlert.description}</p>
+                                      <a href={week.hackathonAlert.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--pink)", fontSize: "0.8rem", fontWeight: 600 }}>
+                                        Register →
+                                      </a>
                                     </div>
-                                  </label>
-                                ))}
-                              </div>
-                            ))}
+                                  )}
+                                  <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                    {week.tasks.map((task) => (
+                                      <label key={task.id} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "8px 0", cursor: "pointer", borderBottom: "1px solid var(--border)" }}>
+                                        <input
+                                          type="checkbox"
+                                          className="task-check"
+                                          checked={!!completedTasks[task.id]}
+                                          onChange={() => toggleTask(task.id)}
+                                          style={{ marginTop: 3 }}
+                                        />
+                                        <div style={{ flex: 1 }}>
+                                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                            <span style={{
+                                              fontWeight: 600, fontSize: "0.9rem",
+                                              textDecoration: completedTasks[task.id] ? "line-through" : "none",
+                                              color: completedTasks[task.id] ? "var(--text-muted)" : "var(--text-primary)",
+                                            }}>
+                                              {task.title}
+                                            </span>
+                                            <span className={`tag ${task.track === "vlsi" ? "tag-vlsi" : task.track === "cyber" ? "tag-cyber" : "tag-general"}`}>
+                                              {task.track}
+                                            </span>
+                                            {task.type === "test" && <span className="tag tag-test">TEST</span>}
+                                            {task.type === "hackathon" && <span className="tag tag-hack">HACKATHON</span>}
+                                            {task.estimatedTime && <span className="tag tag-time">⏱️ {task.estimatedTime}</span>}
+                                          </div>
+                                          <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginTop: 3 }}>{task.description}</p>
+                                        </div>
+                                      </label>
+                                    ))}
+                                  </div>
+
+                                  {/* Integrated Daily Study Slots Schedule Map */}
+                                  <div style={{ marginTop: 14, padding: "12px 16px", background: "rgba(0, 229, 255, 0.02)", borderRadius: 10, border: "1px solid rgba(0, 229, 255, 0.12)" }}>
+                                    <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--vlsi)", display: "block", marginBottom: 8, letterSpacing: 0.8, textTransform: "uppercase" }}>
+                                      🕒 Study Slots Map for this Week
+                                    </span>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8, fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+                                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                                        <span style={{ color: "var(--cyber)", fontWeight: 700, minWidth: "160px" }}>📅 Mon-Fri (7am - 9:30am):</span>
+                                        <span style={{ color: "var(--text-primary)" }}>📚 {weekTheory}</span>
+                                      </div>
+                                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                                        <span style={{ color: "var(--cyber)", fontWeight: 700, minWidth: "160px" }}>📅 Mon-Fri (8pm - 9:45pm):</span>
+                                        <span style={{ color: "var(--text-primary)" }}>💻 {weekLab}</span>
+                                      </div>
+                                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                                        <span style={{ color: "var(--purple)", fontWeight: 700, minWidth: "160px" }}>🗓️ Sat-Sun (Deep Blocks):</span>
+                                        <span style={{ color: "var(--text-primary)" }}>📚 {weekTheory} (Mornings) & 💻 {weekLab} (Afternoons)</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
                       </div>
