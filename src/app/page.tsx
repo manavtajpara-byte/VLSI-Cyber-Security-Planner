@@ -424,6 +424,52 @@ export default function Dashboard() {
           {/* ═══ TIMETABLE TAB ═══ */}
           {activeTab === "timetable" && (
             <div>
+
+              {/* ── DAILY SCHEDULE ── */}
+              <h2 style={{ fontSize: "1.5rem", fontWeight: 900, marginBottom: 16, color: "var(--vlsi)", display: "flex", alignItems: "center", gap: 10 }}>
+                🕒 Your Daily Schedule
+              </h2>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+                {/* Weekday */}
+                <div className="card" style={{ padding: 20, borderLeft: "4px solid var(--vlsi)" }}>
+                  <h3 style={{ fontWeight: 800, color: "var(--vlsi)", marginBottom: 14, fontSize: "1rem" }}>📅 Weekdays (Mon – Fri)</h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: "10px 12px", fontSize: "0.85rem" }}>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>11pm – 6am</span><span>😴 Sleep <span style={{ color: "var(--purple)", fontWeight: 700 }}>(7 hrs)</span></span>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>6am – 7am</span><span>🌅 Morning routine</span>
+                    <span style={{ color: "var(--cyber)", fontWeight: 700 }}>7am – 9:30am</span><span style={{ color: "var(--cyber)", fontWeight: 600 }}>📚 {cyberVlsiTasks}</span>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>9:30am – 10am</span><span>🎒 {isLast6Months ? "Free Time / Deep Work Prep" : "Travel to college"}</span>
+                    <span style={{ color: "var(--vlsi)", fontWeight: 700 }}>10am – 6pm</span><span style={{ color: "var(--vlsi)", fontWeight: 600 }}>{isLast6Months ? "💻 Job Hunting & Advanced Labs" : "🏫 College"}</span>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>6pm – 6:30pm</span><span>☕ Break + freshen up</span>
+                    <span style={{ color: "var(--gold)", fontWeight: 700 }}>6:30pm – 8pm</span><span style={{ color: "var(--gold)", fontWeight: 600 }}>{isLast6Months ? "📚 Interview Prep & Algorithms" : "📝 College Assignments & Tutorials"}</span>
+                    <span style={{ color: "var(--cyber)", fontWeight: 700 }}>8pm – 9:45pm</span><span style={{ color: "var(--cyber)", fontWeight: 600 }}>💻 {practicalTasks}</span>
+                    <span style={{ color: "var(--purple)", fontWeight: 800 }}>9:45pm – 10:30pm</span><span style={{ color: "var(--purple)", fontWeight: 700 }}>🎮 Personal Time (45 min)</span>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>10:30pm – 11pm</span><span>🌙 Wind down</span>
+                  </div>
+                </div>
+
+                {/* Weekend */}
+                <div className="card" style={{ padding: 20, borderLeft: "4px solid var(--cyber)" }}>
+                  <h3 style={{ fontWeight: 800, color: "var(--cyber)", marginBottom: 14, fontSize: "1rem" }}>🗓️ Weekends (Sat – Sun)</h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "90px 1fr", gap: "10px 12px", fontSize: "0.85rem" }}>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>11pm – 7am</span><span>😴 Sleep <span style={{ color: "var(--purple)", fontWeight: 700 }}>(8 hrs)</span></span>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>7am – 8am</span><span>🌅 Morning routine</span>
+                    <span style={{ color: "var(--cyber)", fontWeight: 700 }}>8am – 12pm</span><span style={{ color: "var(--cyber)", fontWeight: 600 }}>📚 Deep Study Block — {cyberVlsiTasks}</span>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>12pm – 1pm</span><span>🍽️ Lunch + rest</span>
+                    <span style={{ color: "var(--cyber)", fontWeight: 700 }}>1pm – 4pm</span><span style={{ color: "var(--cyber)", fontWeight: 600 }}>💻 Hands-on Labs — {practicalTasks}</span>
+                    <span style={{ color: "var(--purple)", fontWeight: 800 }}>4pm – 5pm</span><span style={{ color: "var(--purple)", fontWeight: 700 }}>🎮 Personal Time (45 min)</span>
+                    <span style={{ color: "var(--gold)", fontWeight: 700 }}>5pm – 7pm</span><span style={{ color: "var(--gold)", fontWeight: 600 }}>📖 Weekly Revision</span>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>7pm – 9pm</span><span>💡 Project / Portfolio work</span>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>9pm – 11pm</span><span>🌙 Wind down + Personal Time</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── 3-YEAR CURRICULUM ── */}
+              <h2 style={{ fontSize: "1.5rem", fontWeight: 900, marginBottom: 16, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 10 }}>
+                📚 3-Year Curriculum
+              </h2>
+
               {years.map((year) => (
                 <div key={year} style={{ marginBottom: 32 }}>
                   <h2 style={{ fontSize: "1.3rem", fontWeight: 800, marginBottom: 16, color: "var(--text-primary)" }}>
