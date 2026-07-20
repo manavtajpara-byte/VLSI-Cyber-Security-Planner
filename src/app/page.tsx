@@ -149,6 +149,11 @@ export default function Dashboard() {
   const monthsElapsed = user?.startDate ? Math.floor((new Date().getTime() - new Date(user.startDate).getTime()) / (1000 * 60 * 60 * 24 * 30)) : 0;
   const isLast6Months = monthsElapsed >= 30;
 
+  const currentWeekIndex = Math.floor((monthsElapsed * 30) / 7);
+  const currentWeekPlan = CURRICULUM.find(w => w.weekIndex === currentWeekIndex) || CURRICULUM[0];
+  const cyberVlsiTasks = currentWeekPlan.tasks.filter(t => t.type === 'learn').map(t => t.title).join(" + ") || "Cyber Security / VLSI Study Block";
+  const practicalTasks = currentWeekPlan.tasks.filter(t => t.type === 'practice' || t.type === 'project').map(t => t.title).join(" + ") || "Practical Labs (Kali / Python / Coding)";
+
   // Init: show roadmap immediately — set start date to today
   useEffect(() => {
     try {
@@ -353,6 +358,47 @@ export default function Dashboard() {
           {doneTasks} / {totalTasks} tasks completed
         </p>
       </div>
+
+      {/* ═══ DAILY BACKLOG & CUSTOM TASKS (ALWAYS VISIBLE) ═══ */}
+      <div className="card" style={{ padding: 20, marginBottom: 24, borderLeft: "4px solid var(--pink)" }}>
+        <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: 12 }}>
+          📝 Daily Backlog & Custom Tasks
+        </h2>
+        <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+          <input
+            type="text"
+            className="input"
+            value={newBacklogText}
+            onChange={(e) => setNewBacklogText(e.target.value)}
+            placeholder="e.g. Finish digital logic assignment..."
+            onKeyDown={(e) => e.key === "Enter" && addBacklogTask()}
+            style={{ padding: "8px 12px", background: "rgba(0,0,0,0.2)" }}
+          />
+          <button className="btn btn-primary btn-sm" onClick={addBacklogTask}>Add</button>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {backlogTasks.map((t) => (
+            <label key={t.id} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: 8, cursor: "pointer", border: "1px solid var(--border)" }}>
+              <input
+                type="checkbox"
+                className="task-check"
+                checked={t.done}
+                onChange={() => toggleBacklogTask(t.id)}
+                style={{ marginTop: 2 }}
+              />
+              <span style={{
+                flex: 1, fontWeight: 500, fontSize: "0.9rem",
+                textDecoration: t.done ? "line-through" : "none",
+                color: t.done ? "var(--text-muted)" : "var(--text-primary)",
+              }}>
+                {t.text}
+              </span>
+            </label>
+          ))}
+          {backlogTasks.length === 0 && <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No tasks in your backlog today!</p>}
+        </div>
+      </div>
+
       <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "24px", alignItems: "start" }}>
         {/* LEFT COLUMN: Timetable & Quizzes & Hackathons */}
         <div>
@@ -368,20 +414,6 @@ export default function Dashboard() {
           {/* ═══ LEADERBOARD TAB ═══ */}
           {activeTab === "leaderboard" && (
             <LeaderboardTab currentUserId={user?.id || ""} />
-          )}
-
-                        flex: 1, fontWeight: 500,
-                        textDecoration: t.done ? "line-through" : "none",
-                        color: t.done ? "var(--text-muted)" : "var(--text-primary)",
-                      }}>
-                        {t.text}
-                      </span>
-                    </label>
-                  ))}
-                  {backlogTasks.length === 0 && <p style={{ color: "var(--text-muted)" }}>No tasks in your backlog today!</p>}
-                </div>
-              </div>
-            </div>
           )}
 
           {/* ═══ ANALYTICS TAB ═══ */}
