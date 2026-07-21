@@ -148,11 +148,8 @@ export default function Dashboard() {
 
   const monthsElapsed = user?.startDate ? Math.floor((new Date().getTime() - new Date(user.startDate).getTime()) / (1000 * 60 * 60 * 24 * 30)) : 0;
   const isLast6Months = monthsElapsed >= 30;
-
-  const currentWeekIndex = Math.floor((monthsElapsed * 30) / 7);
-  const currentWeekPlan = CURRICULUM.find(w => w.weekIndex === currentWeekIndex) || CURRICULUM[0];
-  const cyberVlsiTasks = currentWeekPlan.tasks.filter(t => t.type === 'learn').map(t => t.title).join(" + ") || "Cyber Security / VLSI Study Block";
-  const practicalTasks = currentWeekPlan.tasks.filter(t => t.type === 'practice' || t.type === 'project').map(t => t.title).join(" + ") || "Practical Labs (Kali / Python / Coding)";
+  const currentWeekIndex = Math.min(Math.floor((monthsElapsed * 30) / 7), CURRICULUM.length - 1);
+  const [selectedWeekIndex, setSelectedWeekIndex] = useState<number>(0);
 
   // Init: show roadmap immediately — set start date to today
   useEffect(() => {
@@ -160,6 +157,9 @@ export default function Dashboard() {
       const startDate = localStorage.getItem("roadmap-start") || new Date().toISOString();
       localStorage.setItem("roadmap-start", startDate);
       setUser({ id: "guest", phone: "guest", startDate, xp: 0, streak: 0, badges: [] });
+      const elapsed = Math.floor((new Date().getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24 * 30));
+      const wIdx = Math.min(Math.floor((elapsed * 30) / 7), CURRICULUM.length - 1);
+      setSelectedWeekIndex(wIdx);
 
       // Also try to load saved completions from localStorage (no login needed)
       const savedTasks = localStorage.getItem("roadmap-tasks");
@@ -421,131 +421,109 @@ export default function Dashboard() {
             <AnalyticsComponent sessions={(user as any)?.studySessions || []} />
           )}
 
-          {/* ═══ TIMETABLE TAB ═══ */}
-          {activeTab === "timetable" && (
-            <div>
+          {/* ═══ TIMETABLE TAB: FULLY INTEGRATED WEEKLY PLANNER ═══ */}
+          {activeTab === "timetable" && (() => {
+            const selWeek = CURRICULUM[selectedWeekIndex] || CURRICULUM[0];
+            const learnTasks = selWeek.tasks.filter(t => t.type === 'learn');
+            const practiceTasks = selWeek.tasks.filter(t => t.type === 'practice' || t.type === 'project');
+            const testTask = selWeek.tasks.find(t => t.type === 'test');
+            const hackTask = selWeek.tasks.find(t => t.type === 'hackathon');
+            const isCollegePhase = selWeek.month <= 30;
+            const learnLabel = learnTasks.length > 0 ? learnTasks.map(t => t.title).join(' + ') : 'Cyber Security / VLSI Study Block';
+            const practiceLabel = practiceTasks.length > 0 ? practiceTasks.map(t => t.title).join(' + ') : 'Practical Labs';
+            const learnDesc = learnTasks.map(t => t.description).join(' | ');
+            const practiceDesc = practiceTasks.map(t => t.description).join(' | ');
 
-              {years.map((year) => (
-                <div key={year} style={{ marginBottom: 32 }}>
-                  <h2 style={{ fontSize: "1.3rem", fontWeight: 800, marginBottom: 16, color: "var(--text-primary)" }}>
-                    {year === 1 ? "📅 Year 1: Rock-Solid Foundations" : year === 2 ? "📅 Year 2: SystemVerilog & Architecture" : "📅 Year 3: UVM & Job Hunting"}
-                  </h2>
-                  {getMonthsForYear(year).map((month) => {
-                    const weeks = getWeeksForMonth(month);
-                    const monthTasks = weeks.flatMap((w) => w.tasks);
-                    const monthDone = monthTasks.filter((t) => completedTasks[t.id]).length;
-                    const isExpanded = expandedMonths[month] ?? false;
-                    return (
-                      <div key={month} className="card" style={{ marginBottom: 8, overflow: "hidden" }}>
-                        <div className="month-header" onClick={() => toggleMonth(month)}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                            <span style={{ fontSize: "1.2rem" }}>{isExpanded ? "▼" : "▶"}</span>
-                            <div>
-                              <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>Month {month}</span>
-                              <span style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginLeft: 8 }}>
-                                {weeks[0]?.theme}
-                              </span>
-                            </div>
-                          </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                            <span style={{ color: monthDone === monthTasks.length && monthTasks.length > 0 ? "var(--cyber)" : "var(--text-secondary)", fontSize: "0.8rem", fontWeight: 600 }}>
-                              {monthDone}/{monthTasks.length}
-                            </span>
-                            {user && (
-                              <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>
-                                {getWeekCalendarDate(weeks[0]?.weekIndex || 0, user.startDate, vacations)}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        {isExpanded && (
-                          <div style={{ padding: "8px 16px 16px" }}>
-                            {weeks.map((week) => {
-                              const weekTheory = week.tasks.filter(t => t.type === 'learn').map(t => t.title).join(" + ") || "Cyber / VLSI Theory Study";
-                              const weekLab = week.tasks.filter(t => t.type === 'practice' || t.type === 'project').map(t => t.title).join(" + ") || "Practical Hands-on Labs";
-                              return (
-                                <div key={week.weekIndex} style={{ marginBottom: 20, padding: 16, border: "1px solid var(--border)", borderRadius: 12, background: "rgba(255, 255, 255, 0.01)" }}>
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                                    <h4 style={{ fontWeight: 800, fontSize: "0.95rem", color: "var(--text-primary)" }}>{week.title}</h4>
-                                    {user && (
-                                      <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>
-                                        {getWeekCalendarDate(week.weekIndex, user.startDate, vacations)}
-                                      </span>
-                                    )}
-                                  </div>
-                                  {week.hackathonAlert && (
-                                    <div style={{ marginBottom: 10, padding: "10px 14px", background: "var(--pink-glow)", borderRadius: 10, border: "1px solid rgba(255,60,120,0.3)" }}>
-                                      <span className="tag tag-hack" style={{ marginBottom: 6 }}>🏆 {week.hackathonAlert.name}</span>
-                                      <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: 4 }}>{week.hackathonAlert.description}</p>
-                                      <a href={week.hackathonAlert.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--pink)", fontSize: "0.8rem", fontWeight: 600 }}>
-                                        Register →
-                                      </a>
-                                    </div>
-                                  )}
-                                  <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                                    {week.tasks.map((task) => (
-                                      <label key={task.id} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "8px 0", cursor: "pointer", borderBottom: "1px solid var(--border)" }}>
-                                        <input
-                                          type="checkbox"
-                                          className="task-check"
-                                          checked={!!completedTasks[task.id]}
-                                          onChange={() => toggleTask(task.id)}
-                                          style={{ marginTop: 3 }}
-                                        />
-                                        <div style={{ flex: 1 }}>
-                                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                                            <span style={{
-                                              fontWeight: 600, fontSize: "0.9rem",
-                                              textDecoration: completedTasks[task.id] ? "line-through" : "none",
-                                              color: completedTasks[task.id] ? "var(--text-muted)" : "var(--text-primary)",
-                                            }}>
-                                              {task.title}
-                                            </span>
-                                            <span className={`tag ${task.track === "vlsi" ? "tag-vlsi" : task.track === "cyber" ? "tag-cyber" : "tag-general"}`}>
-                                              {task.track}
-                                            </span>
-                                            {task.type === "test" && <span className="tag tag-test">TEST</span>}
-                                            {task.type === "hackathon" && <span className="tag tag-hack">HACKATHON</span>}
-                                            {task.estimatedTime && <span className="tag tag-time">⏱️ {task.estimatedTime}</span>}
-                                          </div>
-                                          <p style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginTop: 3 }}>{task.description}</p>
-                                        </div>
-                                      </label>
-                                    ))}
-                                  </div>
-
-                                  {/* Integrated Daily Study Slots Schedule Map */}
-                                  <div style={{ marginTop: 14, padding: "12px 16px", background: "rgba(0, 229, 255, 0.02)", borderRadius: 10, border: "1px solid rgba(0, 229, 255, 0.12)" }}>
-                                    <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--vlsi)", display: "block", marginBottom: 8, letterSpacing: 0.8, textTransform: "uppercase" }}>
-                                      🕒 Study Slots Map for this Week
-                                    </span>
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8, fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-                                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                                        <span style={{ color: "var(--cyber)", fontWeight: 700, minWidth: "160px" }}>📅 Mon-Fri (7am - 9:30am):</span>
-                                        <span style={{ color: "var(--text-primary)" }}>📚 {weekTheory}</span>
-                                      </div>
-                                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                                        <span style={{ color: "var(--cyber)", fontWeight: 700, minWidth: "160px" }}>📅 Mon-Fri (8pm - 9:45pm):</span>
-                                        <span style={{ color: "var(--text-primary)" }}>💻 {weekLab}</span>
-                                      </div>
-                                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                                        <span style={{ color: "var(--purple)", fontWeight: 700, minWidth: "160px" }}>🗓️ Sat-Sun (Deep Blocks):</span>
-                                        <span style={{ color: "var(--text-primary)" }}>📚 {weekTheory} (Mornings) & 💻 {weekLab} (Afternoons)</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+            const SlotRow = ({ time, emoji, label, desc, color, bold }: { time: string; emoji: string; label: string; desc?: string; color?: string; bold?: boolean }) => (
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: '0 16px', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
+                <div style={{ color: color || 'var(--text-muted)', fontWeight: bold ? 800 : 600, fontSize: '0.8rem', paddingTop: 2 }}>{time}</div>
+                <div>
+                  <div style={{ fontWeight: bold ? 700 : 500, color: color || 'var(--text-primary)', fontSize: '0.9rem' }}>{emoji} {label}</div>
+                  {desc && <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: 3, lineHeight: 1.4 }}>{desc}</div>}
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            );
+
+            return (
+              <div>
+                {/* Week Navigator */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setSelectedWeekIndex(Math.max(0, selectedWeekIndex - 1))} disabled={selectedWeekIndex === 0}>◀ Prev Week</button>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontWeight: 900, fontSize: '1.1rem', color: 'var(--vlsi)' }}>{selWeek.title}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>Week {selWeek.weekIndex + 1} · Month {selWeek.month} · Year {selWeek.year} · {selWeek.theme}</div>
+                    {selWeek.weekIndex === currentWeekIndex && <span className="tag tag-cyber" style={{ marginTop: 6, display: 'inline-block' }}>📍 Current Week</span>}
+                  </div>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setSelectedWeekIndex(Math.min(CURRICULUM.length - 1, selectedWeekIndex + 1))} disabled={selectedWeekIndex === CURRICULUM.length - 1}>Next Week ▶</button>
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setSelectedWeekIndex(currentWeekIndex)}>📍 Jump to Current Week</button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setSelectedWeekIndex(0)}>⏮ Start</button>
+                </div>
+
+                {/* Hackathon Alert */}
+                {selWeek.hackathonAlert && (
+                  <div style={{ marginBottom: 16, padding: '12px 16px', background: 'var(--pink-glow)', borderRadius: 12, border: '1px solid rgba(255,42,112,0.4)' }}>
+                    <span className="tag tag-hack" style={{ marginBottom: 6 }}>🏆 {selWeek.hackathonAlert.name}</span>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: 6 }}>{selWeek.hackathonAlert.description}</p>
+                    <a href={selWeek.hackathonAlert.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--pink)', fontSize: '0.85rem', fontWeight: 700 }}>Register →</a>
+                  </div>
+                )}
+
+                {/* WEEKDAY SCHEDULE */}
+                <div className="card" style={{ padding: 20, marginBottom: 16, borderLeft: '4px solid var(--vlsi)' }}>
+                  <h3 style={{ fontWeight: 800, color: 'var(--vlsi)', marginBottom: 12 }}>📅 Weekday Plan — Mon to Fri</h3>
+                  <SlotRow time="11pm – 6am" emoji="😴" label="Sleep (7 hours)" desc="Essential for memory consolidation and recovery." color="var(--text-muted)" />
+                  <SlotRow time="6am – 7am" emoji="🌅" label="Morning Routine" desc="Freshen up, light breakfast, review today's goals." />
+                  <SlotRow time="7am – 9:30am" emoji="📚" label={learnLabel} desc={learnDesc || 'Theory and concept learning from your curriculum.'} color="var(--cyber)" bold />
+                  <SlotRow time="9:30am – 10am" emoji="🎒" label={isCollegePhase ? 'Travel to College' : 'Deep Work Prep'} desc={isCollegePhase ? 'Commute time — review notes or listen to tech podcasts.' : 'Prepare your workspace and plan the day.'} />
+                  <SlotRow time="10am – 6pm" emoji={isCollegePhase ? '🏫' : '💻'} label={isCollegePhase ? 'College' : 'Full-Time Job Hunting & Advanced Labs'} desc={isCollegePhase ? 'Attend lectures, labs, and college activities.' : 'Apply to jobs, mock interviews, and advanced projects.'} color="var(--vlsi)" bold />
+                  <SlotRow time="6pm – 6:30pm" emoji="☕" label="Break & Freshen Up" desc="Short rest, snack, clear your head before evening session." />
+                  <SlotRow time="6:30pm – 8pm" emoji={isCollegePhase ? '📝' : '📚'} label={isCollegePhase ? 'College Assignments & Tutorials' : 'Interview Prep & Algorithms'} desc={isCollegePhase ? 'Complete homework, assignments, and college tutorials.' : 'LeetCode, system design, behavioural interview practice.'} color="var(--gold)" bold />
+                  <SlotRow time="8pm – 9:45pm" emoji="💻" label={practiceLabel} desc={practiceDesc || 'Hands-on terminal practice, CTF challenges, lab exercises.'} color="var(--cyber)" bold />
+                  {testTask && <SlotRow time="Test Week" emoji="📝" label={testTask.title} desc={testTask.description} color="var(--gold)" bold />}
+                  <SlotRow time="9:45 – 10:30pm" emoji="🎮" label="Personal Time (45 min)" desc="Gaming, social media, hobbies — completely yours." color="var(--purple)" bold />
+                  <SlotRow time="10:30 – 11pm" emoji="🌙" label="Wind Down" desc="No screens, journal, or read before sleep." />
+                </div>
+
+                {/* WEEKEND SCHEDULE */}
+                <div className="card" style={{ padding: 20, marginBottom: 16, borderLeft: '4px solid var(--cyber)' }}>
+                  <h3 style={{ fontWeight: 800, color: 'var(--cyber)', marginBottom: 12 }}>🗓️ Weekend Plan — Sat & Sun</h3>
+                  <SlotRow time="11pm – 7am" emoji="😴" label="Sleep (8 hours)" desc="Extra rest on weekends for better performance." color="var(--text-muted)" />
+                  <SlotRow time="7am – 8am" emoji="🌅" label="Morning Routine" desc="Freshen up and set your weekend study goals." />
+                  <SlotRow time="8am – 12pm" emoji="📚" label={`Deep Study Block — ${learnLabel}`} desc={learnDesc || 'Focused theory, reading, and concept deep-dives.'} color="var(--cyber)" bold />
+                  <SlotRow time="12pm – 1pm" emoji="🍽️" label="Lunch + Rest" desc="Proper meal and a short rest. No screens." />
+                  <SlotRow time="1pm – 4pm" emoji="💻" label={`Hands-on Labs — ${practiceLabel}`} desc={practiceDesc || 'Terminal practice, scripts, exploitation or hardware labs.'} color="var(--cyber)" bold />
+                  <SlotRow time="4pm – 4:45pm" emoji="🎮" label="Personal Time (45 min)" desc="Completely free — do whatever you enjoy." color="var(--purple)" bold />
+                  <SlotRow time="4:45pm – 6:30pm" emoji="📖" label="Weekly Revision" desc={`Review all tasks from this week: ${selWeek.tasks.map(t => t.title).join(', ')}.`} color="var(--gold)" bold />
+                  <SlotRow time="6:30pm – 9pm" emoji="💡" label="Project / Portfolio Work" desc="Build something real — CTF writeup, a tool, or a mini-project." />
+                  <SlotRow time="9pm – 11pm" emoji="🌙" label="Wind Down + Personal Time" desc="Free time, journal, or light reading before sleep." color="var(--purple)" />
+                </div>
+
+                {/* THIS WEEK'S TASKS */}
+                <div className="card" style={{ padding: 20 }}>
+                  <h3 style={{ fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>✅ This Week&apos;s Tasks — Check them off!</h3>
+                  {selWeek.tasks.map((task) => (
+                    <label key={task.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 0', cursor: 'pointer', borderBottom: '1px solid var(--border)' }}>
+                      <input type="checkbox" className="task-check" checked={!!completedTasks[task.id]} onChange={() => toggleTask(task.id)} style={{ marginTop: 3 }} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 600, fontSize: '0.9rem', textDecoration: completedTasks[task.id] ? 'line-through' : 'none', color: completedTasks[task.id] ? 'var(--text-muted)' : 'var(--text-primary)' }}>{task.title}</span>
+                          <span className={`tag ${task.track === 'vlsi' ? 'tag-vlsi' : task.track === 'cyber' ? 'tag-cyber' : 'tag-general'}`}>{task.track}</span>
+                          {task.type === 'test' && <span className="tag tag-test">TEST</span>}
+                          {task.type === 'hackathon' && <span className="tag tag-hack">HACKATHON</span>}
+                          {task.estimatedTime && <span className="tag tag-time">⏱️ {task.estimatedTime}</span>}
+                        </div>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: 3 }}>{task.description}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* (Legacy month accordion — hidden, replaced by weekly planner above) */}
 
           {/* ═══ TESTS TAB ═══ */}
           {activeTab === "tests" && (
